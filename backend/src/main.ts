@@ -6,9 +6,9 @@ import { SeedService } from './services/seed.service';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   
-  // Enable CORS
+  // Enable CORS with more flexible configuration
   app.enableCors({
-    origin: 'http://localhost:3000',
+    origin: process.env.FRONTEND_URL || ['http://localhost:3000', 'https://your-vercel-app.vercel.app'],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
   });
@@ -16,12 +16,13 @@ async function bootstrap() {
   // Enable validation
   app.useGlobalPipes(new ValidationPipe());
   
-  await app.listen(3001);
+  const port = process.env.PORT || 3001;
+  await app.listen(port);
   
   // Seed data after app starts
   const seedService = app.get(SeedService);
   await seedService.seedTickets();
   
-  console.log('Application is running on: http://localhost:3001');
+  console.log(`Application is running on: http://localhost:${port}`);
 }
 bootstrap();
